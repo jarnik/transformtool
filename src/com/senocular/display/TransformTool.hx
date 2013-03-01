@@ -1467,7 +1467,10 @@ class TransformToolMoveShape extends TransformToolInternalControl {
 		// use hitArea if moving under objects
 		// then movement would have the same depth as the tool
 		if (moveUnderObjects) {
+			#if ( cpp || neko )
+			#else
 			hitArea = cast( _transformTool.target, Sprite );
+			#end
 			currTarget = null;
 			relatedObject = this;
 			
@@ -1476,7 +1479,10 @@ class TransformToolMoveShape extends TransformToolInternalControl {
 			// when not moving under objects
 			// use the tool target to handle movement allowing
 			// objects above it to be selectable
+			#if ( cpp || neko )
+			#else
 			hitArea = null;
+			#end
 			currTarget = _transformTool.target;
 			relatedObject = cast( _transformTool.target, InteractiveObject );
 		}
