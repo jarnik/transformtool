@@ -1402,7 +1402,6 @@ class TransformToolInternalControl extends TransformToolControl {
 	}
 	
 	override public function get_referencePoint():Point {
-		//if (referenceName in _transformTool) {
 		if ( Reflect.hasField( _transformTool, referenceName ) ) {
 			return Reflect.getProperty( _transformTool, referenceName );
 		}
@@ -1841,7 +1840,7 @@ class TransformToolScaleCursor extends TransformToolInternalCursor {
 	}
 	
 	override public function updateVisible(event:Event = null):Void {
-		//super.updateVisible(event);
+		super.updateVisible(event);
 		if (event != null && Std.is( event.target, TransformToolScaleControl ) ) {
 			var reference:TransformToolScaleControl = cast( event.target, TransformToolScaleControl );
 			if (reference != null) {
