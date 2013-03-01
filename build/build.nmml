@@ -1,46 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
 	
-	<app title="dream" file="build" main="Main" version="0.0.1" company="jarnik" package="com.jarnik.faxe" />
+	<app title="transformtool" file="transformtool" main="Main" version="0.0.1" company="jarnik" />
 	
-    <!--
-	<window background="0x303030" width="320" height="480" fps="30" orientation="landscape" resizable="true"/>
-    -->
-    <set name="fullscreen" if="target_android" />
-	<window background="0x707070" width="960" height="640" fps="30" orientation="landscape" resizable="true"/>
-    <window width="0" height="0" if="fullscreen" />
-    <!--
-	<window background="0x303030" width="960" height="640" fps="30" orientation="landscape" resizable="true"/>
-	<window if="target_android" background="0x303030" width="320" height="480" fps="30" orientation="landscape" resizable="true"/>
-    -->
+	<window background="0x707070" width="600" height="400" fps="30" orientation="landscape" resizable="true"/>
  	
 	<set name="BUILD_DIR" value="Export" />
 	<classpath name="../src" />
 	<haxelib name="nme" />
-	<haxelib name="svg" />
-    <haxelib name="hxJson2" />
-	
-<!--	<assets path="../../lib" rename="assets" include="*" exclude="nme.svg" /> -->
-<!--
-	<setenv name="no_console" value="1" />
-    <assets path="Assets/music" rename="assets/music" type="music" include="*" />
-    <assets path="Assets/gfx" rename="assets/gfx" include="*" exclude="nme.svg" />
 
-    <assets path="sfx" type="sound" include="*" />
-    <assets path="Assets/music" rename="assets/music" type="music" include="*" />
-    <assets path="Assets/sfx" rename="assets/sfx" type="sound" include="*" />
-    <assets path="Assets/json" rename="assets/json" include="*" />
-    -->
     <assets path="assets" include="*.png" type="image" />
-    <!--
-    -->
-	
-    <!--
-    <assets path="Assets" rename="assets" include="*" exclude="nme.svg" />
-	<icon name="Assets/nme.svg" />
-    <certificate path="jarnik.keystore" password="N4_51ca!" />
-	<icon name="Assets/icon.png" width="16" height="16" />
-    -->
 	
 	<ndll name="std" />
 	<ndll name="regexp" />

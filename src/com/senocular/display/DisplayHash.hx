@@ -2,8 +2,10 @@ package com.senocular.display;
 import nme.display.DisplayObject;
 
 /**
- * ...
- * @author Jarnik
+ * Hash that uses DisplayObject as a key.
+ * Compensation for missing Dictionary.
+ * 
+ * @author Jarnik www.jarnik.com
  */
 class DisplayHash<T>
 {

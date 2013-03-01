@@ -6,6 +6,7 @@ import nme.display.Bitmap;
 import nme.display.Sprite;
 import nme.display.Stage;
 import nme.display.DisplayObjectContainer;
+import nme.geom.Point;
 import nme.text.TextField;
 import nme.text.Font;
 import nme.text.TextFormat;
@@ -19,49 +20,25 @@ import nme.events.KeyboardEvent;
 class Main extends Sprite 
 {
 	
-    private static var inited:Bool;
-	private static var stateLayer:Sprite; 
-
-    private static function initLog():Void {
-		Lib.current.stage.align = StageAlign.TOP_LEFT;
-		Lib.current.stage.scaleMode = StageScaleMode.NO_SCALE;        
-		
-		stateLayer = new Sprite();
-		Lib.current.addChild( stateLayer ); 
-		
-        Lib.current.stage.addEventListener( Event.ENTER_FRAME, update );
-    }
-
-	private static function update( e:Event ) {
-        if ( !inited ) {
-            init();
-        }
-    }
-
-	// Entry point
 	public static function main() {
-        inited = false;
-        initLog();
-	}
-
-    private static function init():Void {
-        inited = true;
-        test();
-    }
-
-    private static function test():Void {
-		var b:Bitmap = new Bitmap( Assets.getBitmapData("assets/rewind.png") );
-		
-		
-		
-		var tool:TransformTool = new TransformTool();
-		stateLayer.addChild( tool );
+		var bgr:Sprite = new Sprite();
+		Lib.current.addChild( bgr );
+		bgr.graphics.beginFill( 0xf0f0f0 );
+		bgr.graphics.drawRect( 0, 0, 600, 400 );
+		bgr.graphics.endFill();
 		
 		var s:Sprite = new Sprite();
-		stateLayer.addChild( s );
-		s.addChild( b );
-		tool.target = s;
+		Lib.current.addChild( s );
 		
+		var b:Bitmap = new Bitmap( Assets.getBitmapData("assets/haxe_logo.png") );
+		s.addChild( b );
+		s.x = (600 - s.width) / 2;
+		s.y = (400 - s.height) / 2;
+		
+		var tool:TransformTool = new TransformTool();
+		Lib.current.addChild( tool );
+		tool.target = s;
+		tool.registration = new Point( s.x + s.width/2, s.y + s.height/2 );
     }
 
 } 
