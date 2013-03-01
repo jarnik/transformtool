@@ -847,16 +847,16 @@ class TransformTool extends Sprite {
 	private function getControlByName(controlName:String):TransformToolInternalControl {
 		var control:TransformToolInternalControl;
 		var containers:Array = new Array(skewControls, registrationControls, cursors, rotateControls, scaleControls);
-		var i:int = containers.length;
+		var i:Int = containers.length;
 		while (i-- && control == null) {
-			control = containers[i].getChildByName(controlName) as TransformToolInternalControl;
-		}
+			control = cast( containers[i].getChildByName(controlName), TransformToolInternalControl );
+		} 
 		return control;
 	}
 	
 	// Interaction Handlers
 	private function startInteractionHandler(event:MouseEvent):Void {
-		_currentControl = event.currentTarget as TransformToolControl;
+		_currentControl = cast( event.currentTarget, TransformToolControl );
 		if (_currentControl) {
 			setupInteraction();
 		}
@@ -906,7 +906,7 @@ class TransformTool extends Sprite {
 	}
 	
 	private function endInteractionHandler(event:MouseEvent):Void {
-		if (event.eventPhase == EventPhase.BUBBLING_PHASE || !(event.currentTarget is Stage)) {
+		if (event.eventPhase == EventPhase.BUBBLING_PHASE || !Std.is(event.currentTarget, Stage)) {
 			// ignore unrelated events received by stage
 			return;
 		}
@@ -918,7 +918,7 @@ class TransformTool extends Sprite {
 		
 		// get stage reference from event in case
 		// stage is no longer accessible from this instance
-		var stageRef:Stage = event.currentTarget as Stage;
+		var stageRef:Stage = cast( event.currentTarget, Stage );
 		stageRef.removeEventListener(MouseEvent.MOUSE_MOVE, interactionHandler);
 		stageRef.removeEventListener(MouseEvent.MOUSE_UP, endInteractionHandler, false);
 		stageRef.removeEventListener(MouseEvent.MOUSE_UP, endInteractionHandler, true);
@@ -1246,7 +1246,7 @@ class TransformTool extends Sprite {
 	
 	private function raiseTarget():Void {
 		// set target to last object in display list
-		var index:int = _target.parent.numChildren - 1;
+		var index:Int = _target.parent.numChildren - 1;
 		_target.parent.setChildIndex(_target, index);
 		
 		// if this tool is in the same display list
@@ -1310,7 +1310,10 @@ class TransformToolInternalControl extends TransformToolControl {
 	public var referenceName:String;
 	public var _skin:DisplayObject;
 	
-	public function set skin(skin:DisplayObject):Void {
+	public var skin( get_skin, set_skin ):DisplayObject;
+	public var referencePoint( get_referencePoint, null ):Point;
+	
+	public function set_skin(skin:DisplayObject):Void {
 		if (_skin && contains(_skin)) {
 			removeChild(_skin);
 		}
@@ -1321,11 +1324,11 @@ class TransformToolInternalControl extends TransformToolControl {
 		draw();
 	}
 	
-	public function get skin():DisplayObject {
+	public function get_skin():DisplayObject {
 		return _skin;
 	}
 	
-	override public function get referencePoint():Point {
+	override public function get_referencePoint():Point {
 		if (referenceName in _transformTool) {
 			return _transformTool[referenceName];
 		}
@@ -1342,7 +1345,7 @@ class TransformToolInternalControl extends TransformToolControl {
 		addEventListener(TransformTool.CONTROL_INIT, init);
 	}
 	
-	protected function init(event:Event):Void {
+	private function init(event:Event):Void {
 		_transformTool.addEventListener(TransformTool.NEW_TARGET, draw);
 		_transformTool.addEventListener(TransformTool.TRANSFORM_TOOL, draw);
 		_transformTool.addEventListener(TransformTool.CONTROL_TRANSFORM_TOOL, position);
@@ -1381,7 +1384,7 @@ class TransformToolMoveShape extends TransformToolInternalControl {
 	function TransformToolMoveShape(name:String, interactionMethod:Function) {
 		super(name, interactionMethod);
 	}
-	11	
+		
 	override public function draw(event:Event = null):Void {
 		
 		var currTarget:DisplayObject;
@@ -1390,7 +1393,7 @@ class TransformToolMoveShape extends TransformToolInternalControl {
 		// use hitArea if moving under objects
 		// then movement would have the same depth as the tool
 		if (moveUnderObjects) {
-			hitArea = _transformTool.target as Sprite;
+			hitArea = cast( _transformTool.target, Sprite );
 			currTarget = null;
 			relatedObject = this;
 			
@@ -1401,7 +1404,7 @@ class TransformToolMoveShape extends TransformToolInternalControl {
 			// objects above it to be selectable
 			hitArea = null;
 			currTarget = _transformTool.target;
-			relatedObject = _transformTool.target as InteractiveObject;
+			relatedObject = cast( _transformTool.target, InteractiveObject );
 		}
 		
 		if (lastTarget != currTarget) {
@@ -1620,7 +1623,7 @@ class TransformToolInternalCursor extends TransformToolCursor {
 		draw();
 	}
 	
-	protected function maintainTransform(event:Event):Void {
+	private function maintainTransform(event:Event):Void {
 		offset = _mouseOffset;
 		if (_transformTool.maintainControlForm) {
 			transform.matrix = new Matrix();
@@ -1632,19 +1635,19 @@ class TransformToolInternalCursor extends TransformToolCursor {
 		updateVisible(event);
 	}
 	
-	protected function drawArc(originX:Float, originY:Float, radius:Float, angle1:Float, angle2:Float, useMove:Bool = true):Void {
+	private function drawArc(originX:Float, originY:Float, radius:Float, angle1:Float, angle2:Float, useMove:Bool = true):Void {
 		var diff:Float = angle2 - angle1;
 		var divs:Float = 1 + Math.floor(Math.abs(diff)/(Math.PI/4));
 		var span:Float = diff/(2*divs);
 		var cosSpan:Float = Math.cos(span);
 		var radiusc:Float = cosSpan ? radius/cosSpan : 0;
-		var i:int;
+		var i:Int;
 		if (useMove) {
 			icon.graphics.moveTo(originX + Math.cos(angle1)*radius, originY - Math.sin(angle1)*radius);
 		}else{
 			icon.graphics.lineTo(originX + Math.cos(angle1)*radius, originY - Math.sin(angle1)*radius);
 		}
-		for (i=0; i<divs; i++) {
+		for ( i in 0...divs ) {
 			angle2 = angle1 + span;
 			angle1 = angle2 + span;
 			icon.graphics.curveTo(
@@ -1654,7 +1657,7 @@ class TransformToolInternalCursor extends TransformToolCursor {
 		}
 	}
 	
-	protected function getGlobalAngle(vector:Point):Float {
+	private function getGlobalAngle(vector:Point):Float {
 		var globalMatrix:Matrix = _transformTool.globalMatrix;
 		vector = globalMatrix.deltaTransformPoint(vector);
 		return Math.atan2(vector.y, vector.x) * (180/Math.PI);
@@ -1758,7 +1761,7 @@ class TransformToolScaleCursor extends TransformToolInternalCursor {
 	override public function updateVisible(event:Event = null):Void {
 		super.updateVisible(event);
 		if (event) {
-			var reference:TransformToolScaleControl = event.target as TransformToolScaleControl;
+			var reference:TransformToolScaleControl = cast( event.target, TransformToolScaleControl );
 			if (reference) {
 				switch(reference) {
 					case _transformTool.scaleTopLeftControl:
@@ -1834,7 +1837,7 @@ class TransformToolSkewCursor extends TransformToolInternalCursor {
 	override public function updateVisible(event:Event = null):Void {
 		super.updateVisible(event);
 		if (event) {
-			var reference:TransformToolSkewBar = event.target as TransformToolSkewBar;
+			var reference:TransformToolSkewBar = cast( event.target, TransformToolSkewBar );
 			if (reference) {
 				switch(reference) {
 					case _transformTool.skewLeftControl:
