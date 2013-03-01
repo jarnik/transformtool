@@ -273,7 +273,7 @@ class TransformTool extends Sprite {
 		dispatchEvent(new Event(NEW_TARGET));
 			
 		// initiate move interaction if applies after controls updated
-		if (_moveNewTargets != null && _moveEnabled && _moveControl != null) {
+		if (_moveNewTargets && _moveEnabled && _moveControl != null) {
 			_currentControl = _moveControl;
 			_currentControl.dispatchEvent(new MouseEvent(MouseEvent.MOUSE_DOWN));
 		}
@@ -917,7 +917,7 @@ class TransformTool extends Sprite {
 	}
 	
 	private function getControlByName(controlName:String):TransformToolInternalControl {
-		var control:TransformToolInternalControl;
+		var control:TransformToolInternalControl = null;
 		var containers:Array<Sprite> = [ skewControls, registrationControls, cursors, rotateControls, scaleControls ];
 		var i:Int = containers.length;
 		while ((i--) != 0 && control == null) {
@@ -1402,8 +1402,9 @@ class TransformToolInternalControl extends TransformToolControl {
 	}
 	
 	override public function get_referencePoint():Point {
-		if (referenceName in _transformTool) {
-			return _transformTool[referenceName];
+		//if (referenceName in _transformTool) {
+		if ( Reflect.hasField( _transformTool, referenceName ) ) {
+			return Reflect.getProperty( _transformTool, referenceName );
 		}
 		return null;
 	}
@@ -1526,7 +1527,7 @@ class TransformToolRegistrationControl extends TransformToolInternalControl {
 
 class TransformToolScaleControl extends TransformToolInternalControl {
 	
-	public function TransformToolScaleControl(name:String, interactionMethod:Dynamic, referenceName:String) {
+	public function new(name:String, interactionMethod:Dynamic, referenceName:String) {
 		super(name, interactionMethod, referenceName);
 	}
 
@@ -1549,7 +1550,7 @@ class TransformToolRotateControl extends TransformToolInternalControl {
 	
 	private var locationName:String;
 	
-	public function TransformToolRotateControl(name:String, interactionMethod:Dynamic, locationName:String) {
+	public function new(name:String, interactionMethod:Dynamic, locationName:String) {
 		super(name, interactionMethod);
 		this.locationName = locationName;
 	}
@@ -1565,8 +1566,8 @@ class TransformToolRotateControl extends TransformToolInternalControl {
 	}
 	
 	override public function position(event:Event = null):Void {
-		if (locationName in _transformTool) {
-			var location:Point = _transformTool[locationName];
+		if (Reflect.hasField( _transformTool, locationName ) ) {
+			var location:Point = Reflect.getProperty( _transformTool, locationName );
 			x = location.x;
 			y = location.y;
 		}
@@ -1594,8 +1595,8 @@ class TransformToolSkewBar extends TransformToolInternalControl {
 		}
 		
 		// derive point locations for bar
-		var locStart:Point = _transformTool[locationStart];
-		var locEnd:Point = _transformTool[locationEnd];
+		var locStart:Point = Reflect.getProperty( _transformTool, locationStart );
+		var locEnd:Point = Reflect.getProperty( _transformTool, locationEnd );
 		
 		// counter transform
 		var toolTrans:Matrix;
@@ -1638,8 +1639,8 @@ class TransformToolSkewBar extends TransformToolInternalControl {
 
 	override public function position(event:Event = null):Void {
 		if (_skin != null) {
-			var locStart:Point = _transformTool[locationStart];
-			var locEnd:Point = _transformTool[locationEnd];
+			var locStart:Point = Reflect.getProperty( _transformTool, locationStart );
+			var locEnd:Point = Reflect.getProperty( _transformTool, locationEnd );
 			var location:Point = Point.interpolate(locStart, locEnd, .5);
 			x = location.x;
 			y = location.y;
