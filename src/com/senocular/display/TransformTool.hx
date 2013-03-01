@@ -1697,7 +1697,7 @@ class TransformToolInternalCursor extends TransformToolCursor {
 	}
 		
 	override private function init(event:Event):Void {
-		//super.init( event );
+		super.init( event );
 		_transformTool.addEventListener(TransformTool.NEW_TARGET, maintainTransform);
 		_transformTool.addEventListener(TransformTool.CONTROL_PREFERENCE, maintainTransform);
 		draw();
@@ -1841,8 +1841,8 @@ class TransformToolScaleCursor extends TransformToolInternalCursor {
 	}
 	
 	override public function updateVisible(event:Event = null):Void {
-		super.updateVisible(event);
-		if (event != null) {
+		//super.updateVisible(event);
+		if (event != null && Std.is( event.target, TransformToolScaleControl ) ) {
 			var reference:TransformToolScaleControl = cast( event.target, TransformToolScaleControl );
 			if (reference != null) {
 				switch(reference) {
@@ -1914,7 +1914,7 @@ class TransformToolSkewCursor extends TransformToolInternalCursor {
 	
 	override public function updateVisible(event:Event = null):Void {
 		super.updateVisible(event);
-		if (event != null) {
+		if (event != null && Std.is( event.target, TransformToolSkewBar )) {
 			var reference:TransformToolSkewBar = cast( event.target, TransformToolSkewBar );
 			if (reference != null ) {
 				switch(reference) {
