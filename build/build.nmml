@@ -3,7 +3,7 @@
 	
 	<app title="transformtool" file="transformtool" main="Main" version="0.0.1" company="jarnik" />
 	
-	<window background="0x707070" width="600" height="400" fps="30" orientation="landscape" resizable="true"/>
+	<window background="0x707070" width="300" height="200" fps="30" orientation="landscape" resizable="true"/>
  	
 	<set name="BUILD_DIR" value="Export" />
 	<classpath name="../src" />

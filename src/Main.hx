@@ -27,8 +27,8 @@ class Main extends Sprite
 		
 		var b:Bitmap = new Bitmap( Assets.getBitmapData("assets/haxe_logo.png") );
 		s.addChild( b );
-		s.x = (600 - s.width) / 2;
-		s.y = (400 - s.height) / 2;
+		s.x = (300 - s.width) / 2;
+		s.y = (200 - s.height) / 2;
 		
 		var tool:TransformTool = new TransformTool();
 		Lib.current.addChild( tool );
