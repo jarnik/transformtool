@@ -1483,10 +1483,10 @@ class TransformToolMoveShape extends TransformToolInternalControl {
 		
 		if (lastTarget != currTarget) {
 			// set up/remove listeners for target being clicked
-			if (lastTarget) {
+			if (lastTarget != null) {
 				lastTarget.removeEventListener(MouseEvent.MOUSE_DOWN, mouseDown, false);
 			}
-			if (currTarget) {
+			if (currTarget != null) {
 				currTarget.addEventListener(MouseEvent.MOUSE_DOWN, mouseDown, false, 0, true);
 			}
 			
@@ -1513,7 +1513,7 @@ class TransformToolRegistrationControl extends TransformToolInternalControl {
 
 	override public function draw(event:Event = null):Void {
 		graphics.clear();
-		if (!_skin) {
+		if (_skin == null) {
 			graphics.lineStyle(1, 0);
 			graphics.beginFill(0xFFFFFF);
 			graphics.drawCircle(0, 0, _transformTool.controlSize/2);
@@ -1532,7 +1532,7 @@ class TransformToolScaleControl extends TransformToolInternalControl {
 
 	override public function draw(event:Event = null):Void {
 		graphics.clear();
-		if (!_skin) {
+		if (_skin == null) {
 			graphics.lineStyle(2, 0xFFFFFF);
 			graphics.beginFill(0);
 			var size = _transformTool.controlSize;
@@ -1556,7 +1556,7 @@ class TransformToolRotateControl extends TransformToolInternalControl {
 
 	override public function draw(event:Event = null):Void {
 		graphics.clear();
-		if (!_skin) {
+		if (_skin == null) {
 			graphics.beginFill(0xFF, 0);
 			graphics.drawCircle(0, 0, _transformTool.controlSize*2);
 			graphics.endFill();
@@ -1588,7 +1588,7 @@ class TransformToolSkewBar extends TransformToolInternalControl {
 	override public function draw(event:Event = null):Void {
 		graphics.clear();
 		
-		if (_skin) {
+		if (_skin != null) {
 			super.draw(event);
 			return;
 		}
@@ -1637,7 +1637,7 @@ class TransformToolSkewBar extends TransformToolInternalControl {
 	}
 
 	override public function position(event:Event = null):Void {
-		if (_skin) {
+		if (_skin != null) {
 			var locStart:Point = _transformTool[locationStart];
 			var locEnd:Point = _transformTool[locationEnd];
 			var location:Point = Point.interpolate(locStart, locEnd, .5);
@@ -1692,10 +1692,11 @@ class TransformToolInternalCursor extends TransformToolCursor {
 		
 		addChild(icon);
 		offset = _mouseOffset;
-		addEventListener(TransformTool.CONTROL_INIT, init);
+		//addEventListener(TransformTool.CONTROL_INIT, init);
 	}
 		
-	private function init(event:Event):Void {
+	override private function init(event:Event):Void {
+		super.init( event );
 		_transformTool.addEventListener(TransformTool.NEW_TARGET, maintainTransform);
 		_transformTool.addEventListener(TransformTool.CONTROL_PREFERENCE, maintainTransform);
 		draw();
@@ -1718,7 +1719,7 @@ class TransformToolInternalCursor extends TransformToolCursor {
 		var divs:Int = 1 + Math.floor(Math.abs(diff)/(Math.PI/4));
 		var span:Float = diff/(2*divs);
 		var cosSpan:Float = Math.cos(span);
-		var radiusc:Float = cosSpan ? radius/cosSpan : 0;
+		var radiusc:Float = cosSpan != 0 ? radius/cosSpan : 0;
 		if (useMove) {
 			icon.graphics.moveTo(originX + Math.cos(angle1)*radius, originY - Math.sin(angle1)*radius);
 		}else{
@@ -1741,7 +1742,7 @@ class TransformToolInternalCursor extends TransformToolCursor {
 	}
 	
 	override public function position(event:Event = null):Void {
-		if (parent) {
+		if (parent != null) {
 			x = parent.mouseX + offset.x;
 			y = parent.mouseY + offset.y;
 		}
@@ -1842,7 +1843,7 @@ class TransformToolScaleCursor extends TransformToolInternalCursor {
 		super.updateVisible(event);
 		if (event != null) {
 			var reference:TransformToolScaleControl = cast( event.target, TransformToolScaleControl );
-			if (reference) {
+			if (reference != null) {
 				switch(reference) {
 					case _transformTool.scaleTopLeftControl, _transformTool.scaleBottomRightControl:
 						icon.rotation = (getGlobalAngle(new Point(0,100)) + getGlobalAngle(new Point(100,0)))/2;

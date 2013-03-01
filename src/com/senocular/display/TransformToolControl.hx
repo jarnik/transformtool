@@ -41,7 +41,7 @@ class TransformToolControl extends MovieClip {
 		return _relatedObject;
 	}
 	public function set_relatedObject(i:InteractiveObject):InteractiveObject {
-		_relatedObject = i ? i : this;
+		_relatedObject = i != null ? i : this;
 		return relatedObject;
 	}
 	

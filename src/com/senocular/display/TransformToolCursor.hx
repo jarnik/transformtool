@@ -52,7 +52,7 @@ class TransformToolCursor extends TransformToolControl {
 	 * @see addReference
 	 */
 	public function removeReference(reference:DisplayObject):DisplayObject {
-		if (reference && references.contains( reference ) ) {
+		if (reference != null && references.contains( reference ) ) {
 			removeReferenceListeners(reference);
 			references.remove( reference );
 			return reference;
