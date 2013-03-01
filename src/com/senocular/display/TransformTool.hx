@@ -269,6 +269,10 @@ class TransformTool extends Sprite {
 			apply();
 		}
 		
+		#if ( cpp || neko )
+		_moveControl.addChild( _target );
+		#end
+		
 		// send event; updates control points
 		dispatchEvent(new Event(NEW_TARGET));
 			
