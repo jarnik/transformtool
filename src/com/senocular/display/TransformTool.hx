@@ -1385,7 +1385,7 @@ class TransformToolInternalControl extends TransformToolControl {
 	
 	public var skin( get_skin, set_skin ):DisplayObject;
 	
-	public function set_skin(skin:DisplayObject):Void {
+	public function set_skin(skin:DisplayObject):DisplayObject {
 		if (_skin != null && contains(_skin)) {
 			removeChild(_skin);
 		}
@@ -1394,6 +1394,7 @@ class TransformToolInternalControl extends TransformToolControl {
 			addChild(_skin);
 		}
 		draw();
+		return skin;
 	}
 	
 	public function get_skin():DisplayObject {
@@ -1714,11 +1715,10 @@ class TransformToolInternalCursor extends TransformToolCursor {
 	
 	private function drawArc(originX:Float, originY:Float, radius:Float, angle1:Float, angle2:Float, useMove:Bool = true):Void {
 		var diff:Float = angle2 - angle1;
-		var divs:Float = 1 + Math.floor(Math.abs(diff)/(Math.PI/4));
+		var divs:Int = 1 + Math.floor(Math.abs(diff)/(Math.PI/4));
 		var span:Float = diff/(2*divs);
 		var cosSpan:Float = Math.cos(span);
 		var radiusc:Float = cosSpan ? radius/cosSpan : 0;
-		var i:Int;
 		if (useMove) {
 			icon.graphics.moveTo(originX + Math.cos(angle1)*radius, originY - Math.sin(angle1)*radius);
 		}else{
@@ -1840,22 +1840,16 @@ class TransformToolScaleCursor extends TransformToolInternalCursor {
 	
 	override public function updateVisible(event:Event = null):Void {
 		super.updateVisible(event);
-		if (event) {
+		if (event != null) {
 			var reference:TransformToolScaleControl = cast( event.target, TransformToolScaleControl );
 			if (reference) {
 				switch(reference) {
-					case _transformTool.scaleTopLeftControl:
-					case _transformTool.scaleBottomRightControl:
+					case _transformTool.scaleTopLeftControl, _transformTool.scaleBottomRightControl:
 						icon.rotation = (getGlobalAngle(new Point(0,100)) + getGlobalAngle(new Point(100,0)))/2;
-						break;
-					case _transformTool.scaleTopRightControl:
-					case _transformTool.scaleBottomLeftControl:
+					case _transformTool.scaleTopRightControl, _transformTool.scaleBottomLeftControl:
 						icon.rotation = (getGlobalAngle(new Point(0,-100)) + getGlobalAngle(new Point(100,0)))/2;
-						break;
-					case _transformTool.scaleTopControl:
-					case _transformTool.scaleBottomControl:
+					case _transformTool.scaleTopControl, _transformTool.scaleBottomControl:
 						icon.rotation = getGlobalAngle(new Point(0,100));
-						break;
 					default:
 						icon.rotation = getGlobalAngle(new Point(100,0));
 				}
@@ -1918,14 +1912,12 @@ class TransformToolSkewCursor extends TransformToolInternalCursor {
 	
 	override public function updateVisible(event:Event = null):Void {
 		super.updateVisible(event);
-		if (event) {
+		if (event != null) {
 			var reference:TransformToolSkewBar = cast( event.target, TransformToolSkewBar );
-			if (reference) {
+			if (reference != null ) {
 				switch(reference) {
-					case _transformTool.skewLeftControl:
-					case _transformTool.skewRightControl:
+					case _transformTool.skewLeftControl, _transformTool.skewRightControl:
 						icon.rotation = getGlobalAngle(new Point(0,100));
-						break;
 					default:
 						icon.rotation = getGlobalAngle(new Point(100,0));
 				}

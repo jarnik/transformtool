@@ -21,8 +21,9 @@ class TransformToolCursor extends TransformToolControl {
 	public function get_mouseOffset():Point {
 		return _mouseOffset.clone();
 	}
-	public function set_mouseOffset(p:Point):Void {
+	public function set_mouseOffset(p:Point):Point {
 		_mouseOffset = p;
+		return mouseOffset;
 	}
 	
 	public function new() {

@@ -26,8 +26,9 @@ class TransformToolControl extends MovieClip {
 	public function get_transformTool():TransformTool {
 		return _transformTool;
 	}
-	public function set_transformTool(t:TransformTool):Void {
+	public function set_transformTool(t:TransformTool):TransformTool {
 		_transformTool = t;
+		return transformTool;
 	}
 	
 	/**
@@ -39,8 +40,9 @@ class TransformToolControl extends MovieClip {
 	public function get_relatedObject():InteractiveObject {
 		return _relatedObject;
 	}
-	public function set_relatedObject(i:InteractiveObject):Void {
+	public function set_relatedObject(i:InteractiveObject):InteractiveObject {
 		_relatedObject = i ? i : this;
+		return relatedObject;
 	}
 	
 	/**
@@ -51,8 +53,9 @@ class TransformToolControl extends MovieClip {
 	public function get_referencePoint():Point {
 		return _referencePoint;
 	}
-	public function set_referencePoint(p:Point):Void {
+	public function set_referencePoint(p:Point):Point {
 		_referencePoint = p;
+		return referencePoint;
 	}
 	
 	/**
