@@ -80,7 +80,7 @@ class TransformTool extends Sprite {
 	private var _rememberRegistration:Bool = true;
 	
 	private var _constrainScale:Bool = false;
-	private var _constrainRotationAngle:Float = Math.PI/4; // default at 45 degrees
+	private var _constrainRotationAngle:Float;
 	private var _constrainRotation:Bool = false;
 	
 	private var _moveUnderObjects:Bool = true;
@@ -237,8 +237,8 @@ class TransformTool extends Sprite {
 	public function setTarget(d:DisplayObject):Void {
 		
 		// null target, set target as null
-		if (!d) {
-			if (_target) {
+		if ( d == null ) {
+			if (_target != null) {
 				_target = null;
 				updateControlsVisible();
 				dispatchEvent(new Event(NEW_TARGET));
@@ -273,7 +273,7 @@ class TransformTool extends Sprite {
 		dispatchEvent(new Event(NEW_TARGET));
 			
 		// initiate move interaction if applies after controls updated
-		if (_moveNewTargets && _moveEnabled && _moveControl) {
+		if (_moveNewTargets != null && _moveEnabled && _moveControl != null) {
 			_currentControl = _moveControl;
 			_currentControl.dispatchEvent(new MouseEvent(MouseEvent.MOUSE_DOWN));
 		}
@@ -701,6 +701,7 @@ class TransformTool extends Sprite {
 		_globalMatrix = new Matrix();
 		
 		_registration = new Point();
+		_constrainRotationAngle = Math.PI/4; // default at 45 degrees
 		
 		_maxScaleX = Math.POSITIVE_INFINITY;
 		_maxScaleY = Math.POSITIVE_INFINITY;
@@ -722,7 +723,7 @@ class TransformTool extends Sprite {
 	 * Provides a string representation of the transform instance
 	 */
 	override public function toString():String {
-		return "[Transform Tool: target=" + String(_target) + "]" ;
+		return "[Transform Tool: target=" + _target + "]" ;
 	}
 	
 	// Setup
@@ -902,7 +903,7 @@ class TransformTool extends Sprite {
 	// Interaction Handlers
 	private function startInteractionHandler(event:MouseEvent):Void {
 		_currentControl = cast( event.currentTarget, TransformToolControl );
-		if (_currentControl) {
+		if (_currentControl != null) {
 			setupInteraction();
 		}
 	}
@@ -913,7 +914,7 @@ class TransformTool extends Sprite {
 		dispatchEvent(new Event(CONTROL_DOWN));
 		
 		// mouse offset to allow interaction from desired point
-		mouseOffset = (_currentControl && _currentControl.referencePoint) ? _currentControl.referencePoint.subtract(new Point(mouseX, mouseY)) : new Point(0, 0);
+		mouseOffset = (_currentControl != null && _currentControl.referencePoint != null) ? _currentControl.referencePoint.subtract(new Point(mouseX, mouseY)) : new Point(0, 0);
 		updateMouse();
 		
 		// set variables for interaction reference
@@ -922,7 +923,7 @@ class TransformTool extends Sprite {
 		interactionStartMatrix = _toolMatrix.clone();
 		interactionStartAngle = distortAngle();
 		
-		if (stage) {
+		if (stage != null) {
 			// setup stage events to manage control interaction
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, interactionHandler);
 			stage.addEventListener(MouseEvent.MOUSE_UP, endInteractionHandler, false);
@@ -1074,8 +1075,8 @@ class TransformTool extends Sprite {
 			var regOffset:Point = innerInteractionStart.subtract(innerRegistration);
 			
 			// find the ratios between movement and the registration offset
-			var ratioH = regOffset.x ? moved.x/regOffset.x : 0;
-			var ratioV = regOffset.y ? moved.y/regOffset.y : 0;
+			var ratioH = regOffset.x != 0 ? moved.x/regOffset.x : 0;
+			var ratioV = regOffset.y != 0 ? moved.y/regOffset.y : 0;
 			
 			// have the larger of the movement distances brought down
 			// based on the lowest ratio to fit the registration offset
@@ -1120,11 +1121,11 @@ class TransformTool extends Sprite {
 	
 	private function distortOffset(offset:Point, regDiff:Float):Point {
 		// get changes in matrix combinations based on targetBounds
-		var ratioH:Float = regDiff ? targetBounds.width/regDiff : 0;
-		var ratioV:Float = regDiff ? targetBounds.height/regDiff : 0;
+		var ratioH:Float = regDiff != 0 ? targetBounds.width/regDiff : 0;
+		var ratioV:Float = regDiff != 0 ? targetBounds.height/regDiff : 0;
 		offset = interactionStartMatrix.transformPoint(offset).subtract(interactionStart);
-		offset.x *= targetBounds.width ? ratioH/targetBounds.width : 0;
-		offset.y *= targetBounds.height ? ratioV/targetBounds.height : 0;
+		offset.x *= targetBounds.width != 0 ? ratioH/targetBounds.width : 0;
+		offset.y *= targetBounds.height != 0 ? ratioV/targetBounds.height : 0;
 		return offset;
 	}
 	
@@ -1159,9 +1160,9 @@ class TransformTool extends Sprite {
 	}
 	
 	private function updateMatrix(useMatrix:Matrix = null, counterTransform:Bool = true):Void {
-		if (_target) {
-			_toolMatrix = useMatrix ? useMatrix.clone() : _target.transform.concatenatedMatrix.clone();
-			if (counterTransform) {
+		if (_target != null) {
+			_toolMatrix = useMatrix != null ? useMatrix.clone() : _target.transform.concatenatedMatrix.clone();
+			if (counterTransform != null) {
 				// counter transform of the parents of the tool
 				var current:Matrix = transform.concatenatedMatrix;
 				current.invert();
@@ -1175,7 +1176,7 @@ class TransformTool extends Sprite {
 	}
 	
 	private function updateBounds():Void {
-		if (_target) {
+		if (_target != null) {
 			// update tool bounds based on target bounds
 			targetBounds = _target.getBounds(_target);
 			_boundsTopLeft = _toolMatrix.transformPoint(new Point(targetBounds.left, targetBounds.top));
@@ -1193,7 +1194,7 @@ class TransformTool extends Sprite {
 	private function updateControlsVisible():Void {
 		// show toolSprites only if there is a valid target
 		var isChild:Bool = contains(toolSprites);
-		if (_target) {
+		if (_target != null) {
 			if (!isChild) {
 				addChild(toolSprites);
 			}				
@@ -1315,14 +1316,14 @@ class TransformTool extends Sprite {
 	 * Applies the current tool transformation to its target instance
 	 */
 	public function apply():Void {
-		if (_target) {
+		if (_target != null) {
 			
 			// get matrix to apply to target
 			var applyMatrix:Matrix = _toolMatrix.clone();
 			applyMatrix.concat(transform.concatenatedMatrix);
 			
 			// if target has a parent, counter parent transformations
-			if (_target.parent) {
+			if (_target.parent != null) {
 				var invertMatrix:Matrix = target.parent.transform.concatenatedMatrix;
 				invertMatrix.invert();
 				applyMatrix.concat(invertMatrix);
@@ -1359,11 +1360,11 @@ class TransformToolInternalControl extends TransformToolControl {
 	public var skin( get_skin, set_skin ):DisplayObject;
 	
 	public function set_skin(skin:DisplayObject):Void {
-		if (_skin && contains(_skin)) {
+		if (_skin != null && contains(_skin)) {
 			removeChild(_skin);
 		}
 		_skin = skin;
-		if (_skin) {
+		if (_skin != null) {
 			addChild(_skin);
 		}
 		draw();
@@ -1427,7 +1428,7 @@ class TransformToolMoveShape extends TransformToolInternalControl {
 	
 	private var lastTarget:DisplayObject;
 	
-	function TransformToolMoveShape(name:String, interactionMethod:Dynamic) {
+	public function new(name:String, interactionMethod:Dynamic) {
 		super(name, interactionMethod);
 	}
 		
@@ -1479,7 +1480,7 @@ class TransformToolMoveShape extends TransformToolInternalControl {
 
 class TransformToolRegistrationControl extends TransformToolInternalControl {
 		
-	function TransformToolRegistrationControl(name:String, interactionMethod:Dynamic, referenceName:String) {
+	public function new(name:String, interactionMethod:Dynamic, referenceName:String) {
 		super(name, interactionMethod, referenceName);
 	}
 
@@ -1498,7 +1499,7 @@ class TransformToolRegistrationControl extends TransformToolInternalControl {
 
 class TransformToolScaleControl extends TransformToolInternalControl {
 	
-	function TransformToolScaleControl(name:String, interactionMethod:Dynamic, referenceName:String) {
+	public function TransformToolScaleControl(name:String, interactionMethod:Dynamic, referenceName:String) {
 		super(name, interactionMethod, referenceName);
 	}
 
@@ -1521,7 +1522,7 @@ class TransformToolRotateControl extends TransformToolInternalControl {
 	
 	private var locationName:String;
 	
-	function TransformToolRotateControl(name:String, interactionMethod:Dynamic, locationName:String) {
+	public function TransformToolRotateControl(name:String, interactionMethod:Dynamic, locationName:String) {
 		super(name, interactionMethod);
 		this.locationName = locationName;
 	}
@@ -1551,7 +1552,7 @@ class TransformToolSkewBar extends TransformToolInternalControl {
 	private var locationStart:String;
 	private var locationEnd:String;
 	
-	function TransformToolSkewBar(name:String, interactionMethod:Dynamic, referenceName:String, locationStart:String, locationEnd:String) {
+	public function new(name:String, interactionMethod:Dynamic, referenceName:String, locationStart:String, locationEnd:String) {
 		super(name, interactionMethod, referenceName);
 		this.locationStart = locationStart;
 		this.locationEnd = locationEnd;
@@ -1626,7 +1627,7 @@ class TransformToolSkewBar extends TransformToolInternalControl {
 
 class TransformToolOutline extends TransformToolInternalControl {
 	
-	function TransformToolOutline(name:String) {
+	function new(name:String) {
 		super(name);
 	}
 
@@ -1654,10 +1655,14 @@ class TransformToolOutline extends TransformToolInternalControl {
 // Cursors
 class TransformToolInternalCursor extends TransformToolCursor {
 	
-	public var offset:Point = new Point();
-	public var icon:Shape = new Shape();
+	public var offset:Point;
+	public var icon:Shape;
 	
-	public function TransformToolInternalCursor() {
+	public function new() {
+		super();
+		offset = new Point();
+		icon = new Shape();
+		
 		addChild(icon);
 		offset = _mouseOffset;
 		addEventListener(TransformTool.CONTROL_INIT, init);
@@ -1725,7 +1730,8 @@ class TransformToolInternalCursor extends TransformToolCursor {
 
 class TransformToolRegistrationCursor extends TransformToolInternalCursor {
 	
-	public function TransformToolRegistrationCursor() {
+	public function new() {
+		super();
 	}
 	
 	override public function draw():Void {
@@ -1739,7 +1745,8 @@ class TransformToolRegistrationCursor extends TransformToolInternalCursor {
 
 class TransformToolMoveCursor extends TransformToolInternalCursor {
 	
-	public function TransformToolMoveCursor() {
+	public function new() {
+		super();
 	}
 	
 	override public function draw():Void {
@@ -1782,7 +1789,8 @@ class TransformToolMoveCursor extends TransformToolInternalCursor {
 
 class TransformToolScaleCursor extends TransformToolInternalCursor {
 	
-	public function TransformToolScaleCursor() {
+	public function new() {
+		super();
 	}
 	
 	override public function draw():Void {
@@ -1833,7 +1841,8 @@ class TransformToolScaleCursor extends TransformToolInternalCursor {
 
 class TransformToolRotateCursor extends TransformToolInternalCursor {
 	
-	public function TransformToolRotateCursor() {
+	public function new() {
+		super();
 	}
 	
 	override public function draw():Void {
@@ -1855,7 +1864,8 @@ class TransformToolRotateCursor extends TransformToolInternalCursor {
 
 class TransformToolSkewCursor extends TransformToolInternalCursor {
 	
-	public function TransformToolSkewCursor() {
+	public function new() {
+		super();
 	}
 	
 	override public function draw():Void {

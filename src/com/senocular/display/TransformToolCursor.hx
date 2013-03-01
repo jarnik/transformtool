@@ -5,17 +5,16 @@ import nme.events.Event;
 import nme.events.MouseEvent;
 import nme.geom.Matrix;
 import nme.geom.Point;
-//import nme.utils.Dictionary;
 
 import com.senocular.display.TransformTool;
 import com.senocular.display.TransformToolControl;
 
 class TransformToolCursor extends TransformToolControl {
 	
-	private var _mouseOffset:Point = new Point(20, 20);
+	private var _mouseOffset:Point;
 	private var contact:Bool = false;
 	private var active:Bool = false;
-	private var references:DisplayHash<Bool> = new DisplayHash<Bool>();
+	private var references:DisplayHash<Bool>;
 		
 	public var mouseOffset( get_mouseOffset, set_mouseOffset ):Point;
 	
@@ -28,6 +27,8 @@ class TransformToolCursor extends TransformToolControl {
 	
 	public function new() {
 		super();
+		_mouseOffset = new Point(20, 20);
+		references = new DisplayHash<Bool>();
 		addEventListener(TransformTool.CONTROL_INIT, init);
 	}
 		
@@ -38,7 +39,7 @@ class TransformToolCursor extends TransformToolControl {
 	 * @see removeReference
 	 */
 	public function addReference(reference:DisplayObject):Void {
-		if (reference && !references.contains(reference)) {
+		if (reference != null && !references.contains(reference)) {
 			references.set( reference, true );
 			addReferenceListeners(reference);
 		}
@@ -77,7 +78,7 @@ class TransformToolCursor extends TransformToolControl {
 	 * Called when the cursor should position itself
 	 */
 	public function position(event:Event = null):Void {
-		if (parent) {
+		if (parent != null ) {
 			x = parent.mouseX + mouseOffset.x;
 			y = parent.mouseY + mouseOffset.y;
 		}
@@ -115,14 +116,14 @@ class TransformToolCursor extends TransformToolControl {
 	
 	private function referenceSet(event:Event):Void {
 		contact = true;
-		if (!_transformTool.currentControl) {
+		if (_transformTool.currentControl == null) {
 			updateVisible(event);
 		}
 	}
 	
 	private function referenceUnset(event:Event):Void {
 		contact = false;
-		if (!_transformTool.currentControl) {
+		if (_transformTool.currentControl == null) {
 			updateVisible(event);
 		}
 	}
