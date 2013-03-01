@@ -1,151 +1,152 @@
-package com.senocular.display {
+package com.senocular.display;
+
+import nme.display.DisplayObject;
+import nme.events.Event;
+import nme.events.MouseEvent;
+import nme.geom.Matrix;
+import nme.geom.Point;
+//import nme.utils.Dictionary;
+
+import com.senocular.display.TransformTool;
+import com.senocular.display.TransformToolControl;
+
+class TransformToolCursor extends TransformToolControl {
 	
-	import flash.display.DisplayObject;
-	import flash.events.Event;
-	import flash.events.MouseEvent;
-	import flash.geom.Matrix;
-	import flash.geom.Point;
-	import flash.utils.Dictionary;
+	private var _mouseOffset:Point = new Point(20, 20);
+	private var contact:Bool = false;
+	private var active:Bool = false;
+	private var references:DisplayHash<Bool> = new DisplayHash<Bool>();
+		
+	public var mouseOffset( get_mouseOffset, set_mouseOffset ):Point;
 	
-	import com.senocular.display.TransformTool;
-	import com.senocular.display.TransformToolControl;
+	public function get_mouseOffset():Point {
+		return _mouseOffset.clone();
+	}
+	public function set_mouseOffset(p:Point):Void {
+		_mouseOffset = p;
+	}
 	
-	public class TransformToolCursor extends TransformToolControl {
+	public function TransformToolCursor() {
+		addEventListener(TransformTool.CONTROL_INIT, init);
+	}
 		
-		protected var _mouseOffset:Point = new Point(20, 20);
-		protected var contact:Boolean = false;
-		protected var active:Boolean = false;
-		protected var references:Dictionary = new Dictionary(true);
-			
-		public function get mouseOffset():Point {
-			return _mouseOffset.clone();
+	/**
+	 * Adds a reference to the list of references that the cursor
+	 * uses to determine when to be displayed.  Typically this would
+	 * be a TransformToolControl instance used in the transform tool
+	 * @see removeReference
+	 */
+	public function addReference(reference:DisplayObject):Void {
+		if (reference && !references.contains(reference)) {
+			references.set( reference, true );
+			addReferenceListeners(reference);
 		}
-		public function set mouseOffset(p:Point):void {
-			_mouseOffset = p;
-		}
-		
-		public function TransformToolCursor() {
-			addEventListener(TransformTool.CONTROL_INIT, init);
-		}
-			
-		/**
-		 * Adds a reference to the list of references that the cursor
-		 * uses to determine when to be displayed.  Typically this would
-		 * be a TransformToolControl instance used in the transform tool
-		 * @see removeReference
-		 */
-		public function addReference(reference:DisplayObject):void {
-			if (reference && !references[reference]) {
-				references[reference] = true;
-				addReferenceListeners(reference);
-			}
-		}
-		
-		/**
-		 * Removes a reference to the list of references that the cursor
-		 * uses to determine when to be displayed.
-		 * @see addReference
-		 */
-		public function removeReference(reference:DisplayObject):DisplayObject {
-			if (reference && references[reference]) {
-				removeReferenceListeners(reference);
-				delete references[reference];
-				return reference;
-			}
-			return null;
-		}
-		
-		/**
-		 * Called when the cursor should determine 
-		 * whether it should be visible or not
-		 */
-		public function updateVisible(event:Event = null):void {
-			if (active) {
-				if (!visible) {
-					visible = true;
-				}
-			}else if (visible != contact) {
-				visible = contact;
-			}
-			position(event);
-		}
-		
-		/**
-		 * Called when the cursor should position itself
-		 */
-		public function position(event:Event = null):void {
-			if (parent) {
-				x = parent.mouseX + mouseOffset.x;
-				y = parent.mouseY + mouseOffset.y;
-			}
-		}
-		
-		private function init(event:Event):void {
-			_transformTool.addEventListener(TransformTool.TRANSFORM_TOOL, position, false, 0, true);
-			_transformTool.addEventListener(TransformTool.NEW_TARGET, referenceUnset, false, 0, true);
-			_transformTool.addEventListener(TransformTool.CONTROL_TRANSFORM_TOOL, position, false, 0, true);
-			_transformTool.addEventListener(TransformTool.CONTROL_DOWN, controlMouseDown, false, 0, true);
-			_transformTool.addEventListener(TransformTool.CONTROL_MOVE, controlMove, false, 0, true);
-			_transformTool.addEventListener(TransformTool.CONTROL_UP, controlMouseUp, false, 0, true);
-			updateVisible(event);
-			position(event);
-		}
-		
-		private function addReferenceListeners(reference:DisplayObject):void {
-			reference.addEventListener(MouseEvent.MOUSE_MOVE, referenceMove, false, 0, true);
-			reference.addEventListener(MouseEvent.MOUSE_DOWN, referenceSet, false, 0, true);
-			reference.addEventListener(MouseEvent.ROLL_OVER, referenceSet, false, 0, true);
-			reference.addEventListener(MouseEvent.ROLL_OUT, referenceUnset, false, 0, true);
-		}
-		
-		private function removeReferenceListeners(reference:DisplayObject):void {
-			reference.removeEventListener(MouseEvent.MOUSE_MOVE, referenceMove, false);
-			reference.removeEventListener(MouseEvent.MOUSE_DOWN, referenceSet, false);
-			reference.removeEventListener(MouseEvent.ROLL_OVER, referenceSet, false);
-			reference.removeEventListener(MouseEvent.ROLL_OUT, referenceUnset, false);
-		}
-		
-		protected function referenceMove(event:MouseEvent):void {
-			position(event);
-			event.updateAfterEvent();
-		}
-		
-		protected function referenceSet(event:Event):void {
-			contact = true;
-			if (!_transformTool.currentControl) {
-				updateVisible(event);
-			}
-		}
-		
-		protected function referenceUnset(event:Event):void {
-			contact = false;
-			if (!_transformTool.currentControl) {
-				updateVisible(event);
-			}
-		}
+	}
 	
-		// the following control methods rely on TransformToolControl.relatedObject
-		// to tell if a reference is being interacted with and therefore active
-		
-		protected function controlMouseDown(event:Event):void {
-			if (references[_transformTool.currentControl.relatedObject]) {
-				active = true;
-				//~ contact = true;
+	/**
+	 * Removes a reference to the list of references that the cursor
+	 * uses to determine when to be displayed.
+	 * @see addReference
+	 */
+	public function removeReference(reference:DisplayObject):DisplayObject {
+		if (reference && references.contains( reference ) ) {
+			removeReferenceListeners(reference);
+			references.remove( reference );
+			return reference;
+		}
+		return null;
+	}
+	
+	/**
+	 * Called when the cursor should determine 
+	 * whether it should be visible or not
+	 */
+	public function updateVisible(event:Event = null):Void {
+		if (active) {
+			if (!visible) {
+				visible = true;
 			}
+		}else if (visible != contact) {
+			visible = contact;
+		}
+		position(event);
+	}
+	
+	/**
+	 * Called when the cursor should position itself
+	 */
+	public function position(event:Event = null):Void {
+		if (parent) {
+			x = parent.mouseX + mouseOffset.x;
+			y = parent.mouseY + mouseOffset.y;
+		}
+	}
+	
+	private function init(event:Event):Void {
+		_transformTool.addEventListener(TransformTool.TRANSFORM_TOOL, position, false, 0, true);
+		_transformTool.addEventListener(TransformTool.NEW_TARGET, referenceUnset, false, 0, true);
+		_transformTool.addEventListener(TransformTool.CONTROL_TRANSFORM_TOOL, position, false, 0, true);
+		_transformTool.addEventListener(TransformTool.CONTROL_DOWN, controlMouseDown, false, 0, true);
+		_transformTool.addEventListener(TransformTool.CONTROL_MOVE, controlMove, false, 0, true);
+		_transformTool.addEventListener(TransformTool.CONTROL_UP, controlMouseUp, false, 0, true);
+		updateVisible(event);
+		position(event);
+	}
+	
+	private function addReferenceListeners(reference:DisplayObject):Void {
+		reference.addEventListener(MouseEvent.MOUSE_MOVE, referenceMove, false, 0, true);
+		reference.addEventListener(MouseEvent.MOUSE_DOWN, referenceSet, false, 0, true);
+		reference.addEventListener(MouseEvent.ROLL_OVER, referenceSet, false, 0, true);
+		reference.addEventListener(MouseEvent.ROLL_OUT, referenceUnset, false, 0, true);
+	}
+	
+	private function removeReferenceListeners(reference:DisplayObject):Void {
+		reference.removeEventListener(MouseEvent.MOUSE_MOVE, referenceMove, false);
+		reference.removeEventListener(MouseEvent.MOUSE_DOWN, referenceSet, false);
+		reference.removeEventListener(MouseEvent.ROLL_OVER, referenceSet, false);
+		reference.removeEventListener(MouseEvent.ROLL_OUT, referenceUnset, false);
+	}
+	
+	private function referenceMove(event:MouseEvent):Void {
+		position(event);
+		event.updateAfterEvent();
+	}
+	
+	private function referenceSet(event:Event):Void {
+		contact = true;
+		if (!_transformTool.currentControl) {
 			updateVisible(event);
 		}
-		
-		protected function controlMove(event:Event):void {
-			if (references[_transformTool.currentControl.relatedObject]) {
-				position(event);
-			}
-		}
-		
-		protected function controlMouseUp(event:Event):void {
-			if (references[_transformTool.currentControl.relatedObject]) {
-				active = false;
-			}
+	}
+	
+	private function referenceUnset(event:Event):Void {
+		contact = false;
+		if (!_transformTool.currentControl) {
 			updateVisible(event);
 		}
+	}
+
+	// the following control methods rely on TransformToolControl.relatedObject
+	// to tell if a reference is being interacted with and therefore active
+	
+	private function controlMouseDown(event:Event):Void {
+		if (references.contains( _transformTool.currentControl.relatedObject ) ) {
+			active = true;
+			//~ contact = true;
+		}
+		updateVisible(event);
+	}
+	
+	private function controlMove(event:Event):Void {
+		if (references.contains( _transformTool.currentControl.relatedObject ) ) {
+			position(event);
+		}
+	}
+	
+	private function controlMouseUp(event:Event):Void {
+		if (references.contains( _transformTool.currentControl.relatedObject ) ) {
+			active = false;
+		}
+		updateVisible(event);
 	}
 }

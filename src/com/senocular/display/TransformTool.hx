@@ -12,7 +12,6 @@ import nme.geom.Matrix;
 import nme.geom.Point;
 import nme.geom.Rectangle;
 import nme.geom.Transform;
-import nme.utils.Dictionary;
 
 // TODO: Documentation
 // TODO: Handle 0-size transformations
@@ -36,7 +35,8 @@ class TransformTool extends Sprite {
 	// Variables
 	private var toolInvertedMatrix:Matrix = new Matrix();
 	private var innerRegistration:Point = new Point();
-	private var registrationLog:Dictionary = new Dictionary(true);
+	//private var registrationLog:Dictionary = new Dictionary(true);
+	private var registrationLog:DisplayHash<Point> = new DisplayHash<Point>();
 	
 	private var targetBounds:Rectangle = new Rectangle();
 	
@@ -406,7 +406,8 @@ class TransformTool extends Sprite {
 		if (_rememberRegistration) {
 			// log new registration point for the next
 			// time this target is selected
-			registrationLog[_target] = innerRegistration;
+			//registrationLog[_target] = innerRegistration;
+			registrationLog.set( _target, innerRegistration );
 		}
 		dispatchEvent(new Event(TRANSFORM_TOOL));
 	}
@@ -560,7 +561,8 @@ class TransformTool extends Sprite {
 	public function set_rememberRegistration(b:Bool):Void {
 		_rememberRegistration = b;
 		if (!_rememberRegistration) {
-			registrationLog = new Dictionary(true);
+			//registrationLog = new Dictionary(true);
+			registrationLog = new DisplayHash<Point>();
 		}
 	}
 	
@@ -950,7 +952,8 @@ class TransformTool extends Sprite {
 		if (_rememberRegistration) {
 			// log new registration point for the next
 			// time this target is selected
-			registrationLog[_target] = innerRegistration;
+			//registrationLog[_target] = innerRegistration;
+			registrationLog.set( _target, innerRegistration );
 		}
 		completeInteraction();
 	}
@@ -1231,11 +1234,11 @@ class TransformTool extends Sprite {
 	
 	// Render
 	private function setNewRegistation():Void {
-		if (_rememberRegistration && _target in registrationLog) {
+		if (_rememberRegistration && registrationLog.contains( _target ) ) {
 			
 			// retrieved saved reg point in log
-			var savedReg:Point = registrationLog[_target];
-			innerRegistration = registrationLog[_target];
+			var savedReg:Point = registrationLog.get( _target );
+			innerRegistration = registrationLog.get( _target );
 		}else{
 			
 			// use internal own point
