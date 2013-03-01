@@ -52,11 +52,15 @@ class Main extends Sprite
     private static function test():Void {
 		var b:Bitmap = new Bitmap( Assets.getBitmapData("assets/rewind.png") );
 		
-		stateLayer.addChild( b );
+		
 		
 		var tool:TransformTool = new TransformTool();
 		stateLayer.addChild( tool );
-		tool.target = b;
+		
+		var s:Sprite = new Sprite();
+		stateLayer.addChild( s );
+		s.addChild( b );
+		tool.target = s;
 		
     }
 

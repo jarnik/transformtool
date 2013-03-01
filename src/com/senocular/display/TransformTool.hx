@@ -1697,7 +1697,7 @@ class TransformToolInternalCursor extends TransformToolCursor {
 	}
 		
 	override private function init(event:Event):Void {
-		super.init( event );
+		//super.init( event );
 		_transformTool.addEventListener(TransformTool.NEW_TARGET, maintainTransform);
 		_transformTool.addEventListener(TransformTool.CONTROL_PREFERENCE, maintainTransform);
 		draw();
