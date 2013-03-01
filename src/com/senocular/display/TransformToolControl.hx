@@ -58,7 +58,8 @@ class TransformToolControl extends MovieClip {
 	/**
 	 * Constructor
 	 */
-	public function TransformToolControl() {
+	public function new() {
+		super();
 		_relatedObject = this;
 	}
 	

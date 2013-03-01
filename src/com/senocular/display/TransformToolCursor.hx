@@ -26,7 +26,8 @@ class TransformToolCursor extends TransformToolControl {
 		_mouseOffset = p;
 	}
 	
-	public function TransformToolCursor() {
+	public function new() {
+		super();
 		addEventListener(TransformTool.CONTROL_INIT, init);
 	}
 		

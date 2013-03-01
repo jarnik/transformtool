@@ -33,38 +33,37 @@ import nme.geom.Transform;
 class TransformTool extends Sprite {
 	
 	// Variables
-	private var toolInvertedMatrix:Matrix = new Matrix();
-	private var innerRegistration:Point = new Point();
-	//private var registrationLog:Dictionary = new Dictionary(true);
-	private var registrationLog:DisplayHash<Point> = new DisplayHash<Point>();
+	private var toolInvertedMatrix:Matrix;
+	private var innerRegistration:Point;
+	private var registrationLog:DisplayHash<Point>;
 	
-	private var targetBounds:Rectangle = new Rectangle();
+	private var targetBounds:Rectangle;
 	
-	private var mouseLoc:Point = new Point();
-	private var mouseOffset:Point = new Point();
-	private var innerMouseLoc:Point = new Point();
-	private var interactionStart:Point = new Point();
-	private var innerInteractionStart:Point = new Point();
+	private var mouseLoc:Point;
+	private var mouseOffset:Point;
+	private var innerMouseLoc:Point;
+	private var interactionStart:Point;
+	private var innerInteractionStart:Point;
 	private var interactionStartAngle:Float = 0;
-	private var interactionStartMatrix:Matrix = new Matrix();
+	private var interactionStartMatrix:Matrix;
 	
-	private var toolSprites:Sprite = new Sprite();
-	private var lines:Sprite = new Sprite();
-	private var moveControls:Sprite = new Sprite();
-	private var registrationControls:Sprite = new Sprite();
-	private var rotateControls:Sprite = new Sprite();
-	private var scaleControls:Sprite = new Sprite();
-	private var skewControls:Sprite = new Sprite();
-	private var cursors:Sprite = new Sprite();
-	private var customControls:Sprite = new Sprite();
-	private var customCursors:Sprite = new Sprite();
+	private var toolSprites:Sprite;
+	private var lines:Sprite;
+	private var moveControls:Sprite;
+	private var registrationControls:Sprite;
+	private var rotateControls:Sprite;
+	private var scaleControls:Sprite;
+	private var skewControls:Sprite;
+	private var cursors:Sprite;
+	private var customControls:Sprite;
+	private var customCursors:Sprite;
 	
 	// With getter/setters
 	private var _target:DisplayObject;
-	private var _toolMatrix:Matrix = new Matrix();
-	private var _globalMatrix:Matrix = new Matrix();
+	private var _toolMatrix:Matrix;
+	private var _globalMatrix:Matrix;
 	
-	private var _registration:Point = new Point();
+	private var _registration:Point;
 	
 	private var _livePreview:Bool = true;
 	private var _raiseNewTargets:Bool = true;
@@ -88,18 +87,18 @@ class TransformTool extends Sprite {
 	private var _maintainControlForm:Bool = true;
 	private var _controlSize:Float = 8;
 		
-	private var _maxScaleX:Float = Infinity;
-	private var _maxScaleY:Float = Infinity;
+	private var _maxScaleX:Float;
+	private var _maxScaleY:Float;
 	
-	private var _boundsTopLeft:Point = new Point();
-	private var _boundsTop:Point = new Point();
-	private var _boundsTopRight:Point = new Point();
-	private var _boundsRight:Point = new Point();
-	private var _boundsBottomRight:Point = new Point();
-	private var _boundsBottom:Point = new Point();
-	private var _boundsBottomLeft:Point = new Point();
-	private var _boundsLeft:Point = new Point();
-	private var _boundsCenter:Point = new Point();
+	private var _boundsTopLeft:Point;
+	private var _boundsTop:Point;
+	private var _boundsTopRight:Point;
+	private var _boundsRight:Point;
+	private var _boundsBottomRight:Point;
+	private var _boundsBottom:Point;
+	private var _boundsBottomLeft:Point;
+	private var _boundsLeft:Point;
+	private var _boundsCenter:Point;
 	
 	private var _currentControl:TransformToolControl;
 	
@@ -671,7 +670,51 @@ class TransformTool extends Sprite {
 	 * TransformTool constructor.
 	 * Creates new instances of the transform tool
 	 */
-	public function TransformTool() {
+	public function new() {
+		super();
+		
+		toolInvertedMatrix = new Matrix();
+		innerRegistration = new Point();
+		registrationLog = new DisplayHash<Point>();
+		
+		targetBounds = new Rectangle();
+		
+		mouseLoc = new Point();
+		mouseOffset = new Point();
+		innerMouseLoc = new Point();
+		interactionStart = new Point();
+		innerInteractionStart = new Point();
+		interactionStartMatrix = new Matrix();
+		
+		toolSprites = new Sprite();
+		lines = new Sprite();
+		moveControls = new Sprite();
+		registrationControls = new Sprite();
+		rotateControls = new Sprite();
+		scaleControls = new Sprite();
+		skewControls = new Sprite();
+		cursors = new Sprite();
+		customControls = new Sprite();
+		customCursors = new Sprite();
+		
+		_toolMatrix = new Matrix();
+		_globalMatrix = new Matrix();
+		
+		_registration = new Point();
+		
+		_maxScaleX = Math.POSITIVE_INFINITY;
+		_maxScaleY = Math.POSITIVE_INFINITY;
+		
+		_boundsTopLeft = new Point();
+		_boundsTop = new Point();
+		_boundsTopRight = new Point();
+		_boundsRight = new Point();
+		_boundsBottomRight = new Point();
+		_boundsBottom = new Point();
+		_boundsBottomLeft = new Point();
+		_boundsLeft = new Point();
+		_boundsCenter = new Point();
+		
 		createControls();
 	}
 	
@@ -1309,12 +1352,11 @@ import com.senocular.display.TransformToolCursor;
 // Controls
 class TransformToolInternalControl extends TransformToolControl {
 	
-	public var interactionMethod:Function;
+	public var interactionMethod:Dynamic;
 	public var referenceName:String;
 	public var _skin:DisplayObject;
 	
 	public var skin( get_skin, set_skin ):DisplayObject;
-	public var referencePoint( get_referencePoint, null ):Point;
 	
 	public function set_skin(skin:DisplayObject):Void {
 		if (_skin && contains(_skin)) {
@@ -1341,7 +1383,8 @@ class TransformToolInternalControl extends TransformToolControl {
 	/*
 	 * Constructor
 	 */	
-	public function TransformToolInternalControl(name:String, interactionMethod:Function = null, referenceName:String = null) {
+	public function new(name:String, interactionMethod:Dynamic = null, referenceName:String = null) {
+		super();
 		this.name = name;
 		this.interactionMethod = interactionMethod;
 		this.referenceName = referenceName;
@@ -1358,7 +1401,7 @@ class TransformToolInternalControl extends TransformToolControl {
 	}
 	
 	public function draw(event:Event = null):Void {
-		if (_transformTool.maintainControlForm) {
+		if (_transformTool.maintainControlForm != null) {
 			counterTransform();
 		}
 		position();
@@ -1366,14 +1409,14 @@ class TransformToolInternalControl extends TransformToolControl {
 	
 	public function position(event:Event = null):Void {
 		var reference:Point = referencePoint;
-		if (reference) {
+		if (reference != null) {
 			x = reference.x;
 			y = reference.y;
 		}
 	}
 	
 	private function controlMove(event:Event):Void {
-		if (interactionMethod && _transformTool.currentControl == this) {
+		if (interactionMethod != null && _transformTool.currentControl == this) {
 			interactionMethod();
 		}
 	}
@@ -1384,7 +1427,7 @@ class TransformToolMoveShape extends TransformToolInternalControl {
 	
 	private var lastTarget:DisplayObject;
 	
-	function TransformToolMoveShape(name:String, interactionMethod:Function) {
+	function TransformToolMoveShape(name:String, interactionMethod:Dynamic) {
 		super(name, interactionMethod);
 	}
 		
@@ -1436,7 +1479,7 @@ class TransformToolMoveShape extends TransformToolInternalControl {
 
 class TransformToolRegistrationControl extends TransformToolInternalControl {
 		
-	function TransformToolRegistrationControl(name:String, interactionMethod:Function, referenceName:String) {
+	function TransformToolRegistrationControl(name:String, interactionMethod:Dynamic, referenceName:String) {
 		super(name, interactionMethod, referenceName);
 	}
 
@@ -1455,7 +1498,7 @@ class TransformToolRegistrationControl extends TransformToolInternalControl {
 
 class TransformToolScaleControl extends TransformToolInternalControl {
 	
-	function TransformToolScaleControl(name:String, interactionMethod:Function, referenceName:String) {
+	function TransformToolScaleControl(name:String, interactionMethod:Dynamic, referenceName:String) {
 		super(name, interactionMethod, referenceName);
 	}
 
@@ -1478,7 +1521,7 @@ class TransformToolRotateControl extends TransformToolInternalControl {
 	
 	private var locationName:String;
 	
-	function TransformToolRotateControl(name:String, interactionMethod:Function, locationName:String) {
+	function TransformToolRotateControl(name:String, interactionMethod:Dynamic, locationName:String) {
 		super(name, interactionMethod);
 		this.locationName = locationName;
 	}
@@ -1508,7 +1551,7 @@ class TransformToolSkewBar extends TransformToolInternalControl {
 	private var locationStart:String;
 	private var locationEnd:String;
 	
-	function TransformToolSkewBar(name:String, interactionMethod:Function, referenceName:String, locationStart:String, locationEnd:String) {
+	function TransformToolSkewBar(name:String, interactionMethod:Dynamic, referenceName:String, locationStart:String, locationEnd:String) {
 		super(name, interactionMethod, referenceName);
 		this.locationStart = locationStart;
 		this.locationEnd = locationEnd;
