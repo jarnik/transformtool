@@ -1188,7 +1188,7 @@ class TransformTool extends Sprite {
 	private function updateMatrix(useMatrix:Matrix = null, counterTransform:Bool = true):Void {
 		if (_target != null) {
 			_toolMatrix = useMatrix != null ? useMatrix.clone() : _target.transform.concatenatedMatrix.clone();
-			if (counterTransform != null) {
+			if (counterTransform) {
 				// counter transform of the parents of the tool
 				var current:Matrix = transform.concatenatedMatrix;
 				current.invert();
@@ -1430,7 +1430,7 @@ class TransformToolInternalControl extends TransformToolControl {
 	}
 	
 	public function draw(event:Event = null):Void {
-		if (_transformTool.maintainControlForm != null) {
+		if (_transformTool.maintainControlForm) {
 			counterTransform();
 		}
 		position();
@@ -1600,7 +1600,7 @@ class TransformToolSkewBar extends TransformToolInternalControl {
 		
 		// counter transform
 		var toolTrans:Matrix;
-		var toolTransInverted:Matrix;
+		var toolTransInverted:Matrix = null;
 		var maintainControlForm:Bool = _transformTool.maintainControlForm;
 		if (maintainControlForm) {
 			toolTrans = transform.concatenatedMatrix;
