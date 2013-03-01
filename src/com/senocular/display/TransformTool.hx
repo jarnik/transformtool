@@ -1576,7 +1576,7 @@ class TransformToolRotateControl extends TransformToolInternalControl {
 	override public function draw(event:Event = null):Void {
 		graphics.clear();
 		if (_skin == null) {
-			graphics.beginFill(0xFF, 0);
+			graphics.beginFill(0xFF, 0.01);
 			graphics.drawCircle(0, 0, _transformTool.controlSize*2);
 			graphics.endFill();
 		}
@@ -1646,7 +1646,7 @@ class TransformToolSkewBar extends TransformToolInternalControl {
 		}
 		
 		// draw bar
-		graphics.beginFill(0xFF0000, 0);
+		graphics.beginFill(0xFF0000, 0.01);
 		graphics.moveTo(corner1.x, corner1.y);
 		graphics.lineTo(corner2.x, corner2.y);
 		graphics.lineTo(corner3.x, corner3.y);

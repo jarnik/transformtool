@@ -15,6 +15,7 @@ import nme.display.Stage;
 import nme.display.StageAlign;
 import nme.display.StageScaleMode;
 import nme.events.Event;
+import nme.events.MouseEvent;
 import nme.events.KeyboardEvent;
 
 class Main extends Sprite 
@@ -34,6 +35,8 @@ class Main extends Sprite
 		s.addChild( b );
 		s.x = (600 - s.width) / 2;
 		s.y = (400 - s.height) / 2;
+		
+		trace("START!");
 		
 		var tool:TransformTool = new TransformTool();
 		Lib.current.addChild( tool );
@@ -61,22 +64,34 @@ class Main extends Sprite
 		trace("icon "+icon.x+" "+icon.y);
 		icon.x = 50;
 		icon.y = 50;
+		
+		
+		
 		/*
 		trace( "tool " + tool.x+" "+tool.y );
 		trace( "toolSprites " + tool.toolSprites + " " + tool.toolSprites.x + " " + tool.toolSprites.y );
 		trace( "scaleControls "+tool.scaleControls+" "+tool.scaleControls.x+" "+tool.scaleControls.y );
 		trace( "scale TOP LEFT " + tool.scaleTopLeftControl +" " + tool.scaleTopLeftControl.x +" " + tool.scaleTopLeftControl.y );
-		trace( "scale TOP LEFT " + tool.scaleTopLeftControl.alpha +" " + tool.scaleTopLeftControl.width +" "
-			+tool.scaleTopLeftControl.height+" "+tool.scaleTopLeftControl.visible );
+		
 		
 		//icon.width = 100;
 		//icon.height = 100;
 		
 		tool.x += 100;
 		tool.y += 100;
-			
-		tool.scaleTopLeftControl.addChild( icon );*/
-		
+			*/
+		//tool.scaleTopLeftControl.addChild( icon );
+		//icon.addEventListener( MouseEvent.MOUSE_MOVE, onMouseMove );
+		trace( s+" has listener "+s.hasEventListener( MouseEvent.MOUSE_MOVE ));
+		tool.skewBottomControl.addEventListener( MouseEvent.MOUSE_MOVE, onMouseMove );
+		trace( "skewBottomControl " + tool.skewBottomControl.alpha +" " + tool.skewBottomControl.width +" "
+			+tool.skewBottomControl.height+" "+tool.skewBottomControl.visible );
+		//tool.toolSprites.addChild( icon );
     }
+	
+	private static function onMouseMove( e:MouseEvent ):Void 
+	{
+		trace("mouse move "+e.stageX);
+	}
 
 } 

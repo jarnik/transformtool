@@ -97,10 +97,10 @@ class TransformToolCursor extends TransformToolControl {
 	}
 	
 	private function addReferenceListeners(reference:DisplayObject):Void {
-		reference.addEventListener(MouseEvent.MOUSE_MOVE, referenceMove, false, 0, true);
-		reference.addEventListener(MouseEvent.MOUSE_DOWN, referenceSet, false, 0, true);
-		reference.addEventListener(MouseEvent.ROLL_OVER, referenceSet, false, 0, true);
-		reference.addEventListener(MouseEvent.ROLL_OUT, referenceUnset, false, 0, true);
+		reference.addEventListener(MouseEvent.MOUSE_MOVE, referenceMove, false);
+		reference.addEventListener(MouseEvent.MOUSE_DOWN, referenceSet, false);
+		reference.addEventListener(MouseEvent.ROLL_OVER, referenceSet, false);
+		reference.addEventListener(MouseEvent.ROLL_OUT, referenceUnset, false);
 	}
 	
 	private function removeReferenceListeners(reference:DisplayObject):Void {
