@@ -1361,6 +1361,22 @@ class TransformTool extends Sprite {
 			dispatchEvent(new Event(TRANSFORM_TARGET));
 		}
 	}
+	
+	public function getPointByReferenceName( ref:String ):Point {
+		switch ( ref ) {
+			case "registration": return registration;
+			case "boundsTopLeft": return boundsTopLeft;
+			case "boundsTop": return boundsTop;
+			case "boundsTopRight": return boundsTopRight;
+			case "boundsRight": return boundsRight;
+			case "boundsBottomRight": return boundsBottomRight;
+			case "boundsBottom": return boundsBottom;
+			case "boundsBottomLeft": return boundsBottomLeft;
+			case "boundsLeft": return boundsLeft;
+			case "boundsCenter": return boundsCenter;
+		}
+		return null;
+	}
 }
 
 import nme.display.DisplayObject;
@@ -1402,10 +1418,7 @@ class TransformToolInternalControl extends TransformToolControl {
 	}
 	
 	override public function get_referencePoint():Point {
-		if ( Reflect.hasField( _transformTool, referenceName ) ) {
-			return Reflect.getProperty( _transformTool, referenceName );
-		}
-		return null;
+		return _transformTool.getPointByReferenceName( referenceName );
 	}
 		
 	/*
@@ -1571,8 +1584,8 @@ class TransformToolRotateControl extends TransformToolInternalControl {
 	}
 	
 	override public function position(event:Event = null):Void {
-		if (Reflect.hasField( _transformTool, locationName ) ) {
-			var location:Point = Reflect.getProperty( _transformTool, locationName );
+		if ( _transformTool.getPointByReferenceName( locationName ) != null ) {
+			var location:Point = _transformTool.getPointByReferenceName( locationName );
 			x = location.x;
 			y = location.y;
 		}
@@ -1600,8 +1613,8 @@ class TransformToolSkewBar extends TransformToolInternalControl {
 		}
 		
 		// derive point locations for bar
-		var locStart:Point = Reflect.getProperty( _transformTool, locationStart );
-		var locEnd:Point = Reflect.getProperty( _transformTool, locationEnd );
+		var locStart:Point = _transformTool.getPointByReferenceName( locationStart );
+		var locEnd:Point = _transformTool.getPointByReferenceName( locationEnd );
 		
 		// counter transform
 		var toolTrans:Matrix;
@@ -1644,8 +1657,8 @@ class TransformToolSkewBar extends TransformToolInternalControl {
 
 	override public function position(event:Event = null):Void {
 		if (_skin != null) {
-			var locStart:Point = Reflect.getProperty( _transformTool, locationStart );
-			var locEnd:Point = Reflect.getProperty( _transformTool, locationEnd );
+			var locStart:Point = _transformTool.getPointByReferenceName( locationStart );
+			var locEnd:Point = _transformTool.getPointByReferenceName( locationEnd );
 			var location:Point = Point.interpolate(locStart, locEnd, .5);
 			x = location.x;
 			y = location.y;

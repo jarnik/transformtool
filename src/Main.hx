@@ -38,7 +38,45 @@ class Main extends Sprite
 		var tool:TransformTool = new TransformTool();
 		Lib.current.addChild( tool );
 		tool.target = s;
-		tool.registration = new Point( s.x + s.width/2, s.y + s.height/2 );
+		tool.registration = new Point( s.x + s.width / 2, s.y + s.height / 2 );
+		
+		/*
+		var c:TransformToolScaleControl = new TransformToolScaleControl(TransformTool.SCALE_BOTTOM, null, "boundsBottom");
+		Lib.current.addChild( c );
+		c.x = 50;
+		c.y = 50;
+		c.transformTool = tool;
+		c.draw();
+		*/
+		
+		var icon:Sprite = new Sprite();
+		icon.graphics.clear();
+		icon.graphics.lineStyle(2, 0xFF0000);
+		icon.graphics.beginFill( 0x00ff00);
+		var size = tool.controlSize;
+		var size2:Float = size/2;
+		icon.graphics.drawRect(-size2, -size2, size, size);
+		icon.graphics.endFill();
+		//Lib.current.addChild( icon );
+		trace("icon "+icon.x+" "+icon.y);
+		icon.x = 50;
+		icon.y = 50;
+		/*
+		trace( "tool " + tool.x+" "+tool.y );
+		trace( "toolSprites " + tool.toolSprites + " " + tool.toolSprites.x + " " + tool.toolSprites.y );
+		trace( "scaleControls "+tool.scaleControls+" "+tool.scaleControls.x+" "+tool.scaleControls.y );
+		trace( "scale TOP LEFT " + tool.scaleTopLeftControl +" " + tool.scaleTopLeftControl.x +" " + tool.scaleTopLeftControl.y );
+		trace( "scale TOP LEFT " + tool.scaleTopLeftControl.alpha +" " + tool.scaleTopLeftControl.width +" "
+			+tool.scaleTopLeftControl.height+" "+tool.scaleTopLeftControl.visible );
+		
+		//icon.width = 100;
+		//icon.height = 100;
+		
+		tool.x += 100;
+		tool.y += 100;
+			
+		tool.scaleTopLeftControl.addChild( icon );*/
+		
     }
 
 } 
