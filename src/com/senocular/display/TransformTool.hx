@@ -137,7 +137,8 @@ class TransformTool extends Sprite {
 	public static inline var CONTROL_DOWN:String = "controlDown";
 	public static inline var CONTROL_MOVE:String = "controlMove";
 	public static inline var CONTROL_UP:String = "controlUp";
-	public static inline var CONTROL_PREFERENCE:String = "controlPreference";
+    public static inline var CONTROL_PREFERENCE:String = "controlPreference";
+	public static inline var COMPLETE_INTERACTION:String = "completeInteraction";
 	
 	// Skin constants
 	public static inline var REGISTRATION:String = "registration";
@@ -1169,6 +1170,7 @@ class TransformTool extends Sprite {
 			_toolMatrix.ty += offset.y;
 		}
 		updateBounds();
+		dispatchEvent(new Event(COMPLETE_INTERACTION));
 	}
 	
 	// Information
