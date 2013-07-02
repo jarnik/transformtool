@@ -13,6 +13,19 @@ import nme.geom.Point;
 import nme.geom.Rectangle;
 import nme.geom.Transform;
 
+import nme.display.DisplayObject;
+import nme.display.InteractiveObject;
+import nme.display.Shape;
+import nme.display.Sprite;
+import nme.events.Event;
+import nme.events.MouseEvent;
+import nme.geom.Matrix;
+import nme.geom.Point;
+
+import com.senocular.display.TransformTool;
+import com.senocular.display.TransformToolControl;
+import com.senocular.display.TransformToolCursor;
+
 // TODO: Documentation
 // TODO: Handle 0-size transformations
 
@@ -138,7 +151,10 @@ class TransformTool extends Sprite {
 	public static inline var CONTROL_MOVE:String = "controlMove";
 	public static inline var CONTROL_UP:String = "controlUp";
     public static inline var CONTROL_PREFERENCE:String = "controlPreference";
-	public static inline var COMPLETE_INTERACTION:String = "completeInteraction";
+	public static inline var INTERACTION_MOVE:String = "interactionMove";
+	public static inline var INTERACTION_SCALE:String = "interactionScale";
+	public static inline var INTERACTION_ROTATE:String = "interactionRotate";
+	public static inline var INTERACTION_REGISTRATION_MOVED:String = "interactionRegistrationMoved";
 	
 	// Skin constants
 	public static inline var REGISTRATION:String = "registration";
@@ -165,10 +181,10 @@ class TransformTool extends Sprite {
 	public static inline var CURSOR_SKEW:String = "cursorSkew";
 	
 	// Properties
-	public var target(getTarget, setTarget):DisplayObject;
-	public var raiseNewTargets( getRaiseNewTargets, setRaiseNewTargets ):Bool;
-	public var moveNewTargets( getMoveNewTargets, setMoveNewTargets ):Bool;
-	public var livePreview( getLivePreview, setLivePreview ):Bool;
+	public var target( get, set ):DisplayObject;
+	public var raiseNewTargets( get, set ):Bool;
+	public var moveNewTargets( get, set ):Bool;
+	public var livePreview( get, set ):Bool;
 	public var controlSize( get_controlSize, set_controlSize ):Float;
 	public var maintainControlForm( get_maintainControlForm, set_maintainControlForm ):Bool;
 	public var moveUnderObjects( get_moveUnderObjects, set_moveUnderObjects ):Bool;
@@ -232,10 +248,10 @@ class TransformTool extends Sprite {
 	/**
 	 * The display object the transform tool affects
 	 */
-	public function getTarget():DisplayObject {
+	public function get_target():DisplayObject {
 		return _target;
 	}
-	public function setTarget(d:DisplayObject):DisplayObject {
+	public function set_target(d:DisplayObject):DisplayObject {
 		
 		// null target, set target as null
 		if ( d == null ) {
@@ -270,10 +286,6 @@ class TransformTool extends Sprite {
 			apply();
 		}
 		
-		#if ( cpp || neko )
-		_moveControl.addChild( _target );
-		#end
-		
 		// send event; updates control points
 		dispatchEvent(new Event(NEW_TARGET));
 			
@@ -290,10 +302,10 @@ class TransformTool extends Sprite {
 	 * When true, new targets are placed at the top of their display list
 	 * @see target
 	 */
-	public function getRaiseNewTargets():Bool {
+	public function get_raiseNewTargets():Bool {
 		return _raiseNewTargets;
 	}
-	public function setRaiseNewTargets(b:Bool):Bool {
+	public function set_raiseNewTargets(b:Bool):Bool {
 		_raiseNewTargets = b;
 		return raiseNewTargets;
 	}
@@ -303,10 +315,10 @@ class TransformTool extends Sprite {
 	 * @see target
 	 * @see moveEnabled
 	 */
-	public function getMoveNewTargets():Bool {
+	public function get_moveNewTargets():Bool {
 		return _moveNewTargets;
 	}
-	public function setMoveNewTargets(b:Bool):Bool {
+	public function set_moveNewTargets(b:Bool):Bool {
 		_moveNewTargets = b;
 		return moveNewTargets;
 	}
@@ -315,10 +327,10 @@ class TransformTool extends Sprite {
 	 * When true, the target instance scales with the tool as it is transformed.
 	 * When false, transforms in the tool are only reflected when transforms are completed.
 	 */
-	public function getLivePreview():Bool {
+	public function get_livePreview():Bool {
 		return _livePreview;
 	}
-	public function setLivePreview(b:Bool):Bool {
+	public function set_livePreview(b:Bool):Bool {
 		_livePreview = b;
 		return livePreview;
 	}
@@ -1010,9 +1022,10 @@ class TransformTool extends Sprite {
 	public function moveInteraction():Void {
 		var moveLoc:Point = mouseLoc.subtract(interactionStart);
 		_toolMatrix.tx += moveLoc.x;
-		_toolMatrix.ty += moveLoc.y;
+		_toolMatrix.ty += moveLoc.y;		
 		updateRegistration();
 		completeInteraction();
+		dispatchEvent(new Event(INTERACTION_MOVE));
 	}
 	
 	/**
@@ -1031,6 +1044,7 @@ class TransformTool extends Sprite {
 			registrationLog.set( _target, innerRegistration );
 		}
 		completeInteraction();
+		dispatchEvent(new Event(INTERACTION_REGISTRATION_MOVED));
 	}
 	
 	/**
@@ -1061,6 +1075,7 @@ class TransformTool extends Sprite {
 		
 		_toolMatrix.concat(globalInvertedMatrix);
 		completeInteraction(true);
+		dispatchEvent(new Event(INTERACTION_ROTATE));
 	}
 	
 	/**
@@ -1075,6 +1090,7 @@ class TransformTool extends Sprite {
 		_toolMatrix.a += distortH.x;
 		_toolMatrix.b += distortH.y;
 		completeInteraction(true);
+		dispatchEvent(new Event(INTERACTION_SCALE));
 	}
 	
 	/**
@@ -1088,6 +1104,7 @@ class TransformTool extends Sprite {
 		_toolMatrix.c += distortV.x;
 		_toolMatrix.d += distortV.y;
 		completeInteraction(true);
+		dispatchEvent(new Event(INTERACTION_SCALE));
 	}
 	
 	/**
@@ -1128,6 +1145,7 @@ class TransformTool extends Sprite {
 		_toolMatrix.c += distortV.x;
 		_toolMatrix.d += distortV.y;
 		completeInteraction(true);
+		dispatchEvent(new Event(INTERACTION_SCALE));
 	}
 	
 	/**
@@ -1169,8 +1187,7 @@ class TransformTool extends Sprite {
 			_toolMatrix.tx += offset.x;
 			_toolMatrix.ty += offset.y;
 		}
-		updateBounds();
-		dispatchEvent(new Event(COMPLETE_INTERACTION));
+		updateBounds();		
 	}
 	
 	// Information
@@ -1385,19 +1402,6 @@ class TransformTool extends Sprite {
 	}
 }
 
-import nme.display.DisplayObject;
-import nme.display.InteractiveObject;
-import nme.display.Shape;
-import nme.display.Sprite;
-import nme.events.Event;
-import nme.events.MouseEvent;
-import nme.geom.Matrix;
-import nme.geom.Point;
-
-import com.senocular.display.TransformTool;
-import com.senocular.display.TransformToolControl;
-import com.senocular.display.TransformToolCursor;
-
 // Controls
 class TransformToolInternalControl extends TransformToolControl {
 	
@@ -1487,6 +1491,18 @@ class TransformToolMoveShape extends TransformToolInternalControl {
 		// then movement would have the same depth as the tool
 		if (moveUnderObjects) {
 			#if ( cpp || neko )
+				var topLeft:Point = _transformTool.boundsTopLeft;
+				var topRight:Point = _transformTool.boundsTopRight;
+				var bottomRight:Point = _transformTool.boundsBottomRight;
+				var bottomLeft:Point = _transformTool.boundsBottomLeft;
+				
+				graphics.clear();
+				graphics.beginFill( 0xf00000, 0.01 );
+				graphics.moveTo( topLeft.x, topLeft.y );
+				graphics.lineTo( topRight.x, topRight.y );
+				graphics.lineTo( bottomRight.x, bottomRight.y );
+				graphics.lineTo( bottomLeft.x, bottomLeft.y );
+				graphics.endFill();
 			#else
 			hitArea = cast( _transformTool.target, Sprite );
 			#end
@@ -1499,6 +1515,18 @@ class TransformToolMoveShape extends TransformToolInternalControl {
 			// use the tool target to handle movement allowing
 			// objects above it to be selectable
 			#if ( cpp || neko )
+			var topLeft:Point = _transformTool.boundsTopLeft;
+				var topRight:Point = _transformTool.boundsTopRight;
+				var bottomRight:Point = _transformTool.boundsBottomRight;
+				var bottomLeft:Point = _transformTool.boundsBottomLeft;
+				
+				graphics.clear();
+				graphics.beginFill( 0xf00000, 0.01 );
+				graphics.moveTo( topLeft.x, topLeft.y );
+				graphics.lineTo( topRight.x, topRight.y );
+				graphics.lineTo( bottomRight.x, bottomRight.y );
+				graphics.lineTo( bottomLeft.x, bottomLeft.y );
+				graphics.endFill();
 			#else
 			hitArea = null;
 			#end
@@ -1524,6 +1552,12 @@ class TransformToolMoveShape extends TransformToolInternalControl {
 		}
 	}
 	
+	#if neko
+	override public function position(event:Event = null):Void {
+		draw(event);
+	}
+	#end
+
 	private function mouseDown(event:MouseEvent):Void {
 		dispatchEvent(new MouseEvent(MouseEvent.MOUSE_DOWN));
 	}
@@ -1869,6 +1903,8 @@ class TransformToolScaleCursor extends TransformToolInternalCursor {
 		if (event != null && Std.is( event.target, TransformToolScaleControl ) ) {
 			var reference:TransformToolScaleControl = cast( event.target, TransformToolScaleControl );
 			if (reference != null) {
+				/*
+				 * // probably not supported in Haxe 3
 				switch(reference) {
 					case _transformTool.scaleTopLeftControl, _transformTool.scaleBottomRightControl:
 						icon.rotation = (getGlobalAngle(new Point(0,100)) + getGlobalAngle(new Point(100,0)))/2;
@@ -1879,6 +1915,15 @@ class TransformToolScaleCursor extends TransformToolInternalCursor {
 					default:
 						icon.rotation = getGlobalAngle(new Point(100,0));
 				}
+				*/
+				if ( reference == _transformTool.scaleTopLeftControl || reference == _transformTool.scaleBottomRightControl )
+						icon.rotation = (getGlobalAngle(new Point(0,100)) + getGlobalAngle(new Point(100,0)))/2;
+				else if ( reference == _transformTool.scaleTopRightControl || reference == _transformTool.scaleBottomLeftControl )
+						icon.rotation = (getGlobalAngle(new Point(0,-100)) + getGlobalAngle(new Point(100,0)))/2;
+				else if ( reference == _transformTool.scaleTopControl || reference == _transformTool.scaleBottomControl )
+						icon.rotation = getGlobalAngle(new Point(0,100));
+				else
+						icon.rotation = getGlobalAngle(new Point(100,0));
 			}
 		}
 	}
@@ -1941,12 +1986,18 @@ class TransformToolSkewCursor extends TransformToolInternalCursor {
 		if (event != null && Std.is( event.target, TransformToolSkewBar )) {
 			var reference:TransformToolSkewBar = cast( event.target, TransformToolSkewBar );
 			if (reference != null ) {
+				/*
 				switch(reference) {
 					case _transformTool.skewLeftControl, _transformTool.skewRightControl:
 						icon.rotation = getGlobalAngle(new Point(0,100));
 					default:
 						icon.rotation = getGlobalAngle(new Point(100,0));
-				}
+				}*/
+				
+				if ( reference == _transformTool.skewLeftControl || reference == _transformTool.skewRightControl )
+					icon.rotation = getGlobalAngle(new Point(0,100));
+				else
+					icon.rotation = getGlobalAngle(new Point(100,0));
 			}
 		}
 	}
